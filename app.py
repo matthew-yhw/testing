@@ -4,15 +4,28 @@ import matplotlib.pyplot as plt
 from streamlit_folium import st_folium
 import folium
 
-# Step 1: Create test data with latitude and longitude
-df = pd.DataFrame({
-    'region': ['Kowloon', 'Kowloon', 'Hong Kong Island', 'Hong Kong Island'],
-    'car_park': ['Park A', 'Park B', 'Park C', 'Park D'],
-    'timestamp': pd.date_range('2025-11-01', periods=4, freq='15min'),
-    'vacancy': [10, 20, 15, 5],
-    'latitude': [22.3167, 22.3231, 22.2800, 22.2750],
-    'longitude': [114.1700, 114.1650, 114.1588, 114.1500]
-})
+# Step 1: Create test data with 4 timestamps per car park and random vacancies
+np.random.seed(42)  # For reproducible random numbers
+car_parks = ['Park A', 'Park B', 'Park C', 'Park D']
+regions = ['Kowloon', 'Kowloon', 'Hong Kong Island', 'Hong Kong Island']
+latitudes = [22.3167, 22.3231, 22.2800, 22.2750]
+longitudes = [114.1700, 114.1650, 114.1588, 114.1500]
+timestamps = pd.date_range('2025-11-01', periods=4, freq='15min')
+
+# Create DataFrame
+data = []
+for i, car_park in enumerate(car_parks):
+    for ts in timestamps:
+        data.append({
+            'region': regions[i],
+            'car_park': car_park,
+            'timestamp': ts,
+            'vacancy': np.random.randint(0, 51),  # Random vacancy between 0 and 50
+            'latitude': latitudes[i],
+            'longitude': longitudes[i]
+        })
+
+df = pd.DataFrame(data)
 
 # Ensure timestamp is datetime
 df['timestamp'] = pd.to_datetime(df['timestamp'])
