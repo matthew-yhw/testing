@@ -81,26 +81,34 @@ else:
     st.write('No valid latitude/longitude data available for this region.')
 
 # Step 7: Dropdown for selecting car park (syncs with map clicks)
-selected_car_park = st.selectbox('Select Car Park', car_parks, 
-                                 index=car_parks.index(st.session_state.selected_car_park) 
-                                 if st.session_state.selected_car_park in car_parks else 0,
-                                 key='car_park_select_unique')
-
-# Update session state when dropdown changes
-if selected_car_park != st.session_state.selected_car_park:
-    st.session_state.selected_car_park = selected_car_park
+if car_parks:  # Ensure car_parks is not empty
+    selected_car_park = st.selectbox(
+        'Select Car Park',
+        car_parks,
+        index=car_parks.index(st.session_state.selected_car_park) if st.session_state.selected_car_park in car_parks else 0,
+        key='car_park_select_unique'
+    )
+    # Update session state when dropdown changes
+    if selected_car_park != st.session_state.selected_car_park:
+        st.session_state.selected_car_park = selected_car_park
+else:
+    st.write('No car parks available for this region.')
+    st.session_state.selected_car_park = None
 
 # Step 8: Plot bar chart for the selected car park
-park_data = region_data[region_data['car_park'] == st.session_state.selected_car_park].sort_values('timestamp')
-if not park_data.empty:
-    st.subheader(f'Vacancy for {st.session_state.selected_car_park}')
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.bar(park_data['timestamp'], park_data['vacancy'], width=0.01)
-    ax.set_xlabel('Timestamp')
-    ax.set_ylabel('Vacancy')
-    ax.set_title(f'Vacancy Historical Record for {st.session_state.selected_car_park}')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    st.pyplot(fig)
+if st.session_state.selected_car_park:
+    park_data = region_data[region_data['car_park'] == st.session_state.selected_car_park].sort_values('timestamp')
+    if not park_data.empty:
+        st.subheader(f'Vacancy for {st.session_state.selected_car_park}')
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.bar(park_data['timestamp'], park_data['vacancy'], width=0.01)
+        ax.set_xlabel('Timestamp')
+        ax.set_ylabel('Vacancy')
+        ax.set_title(f'Vacancy Historical Record for {st.session_state.selected_car_park}')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        st.pyplot(fig)
+    else:
+        st.write('No data available for the selected car park.')
 else:
-    st.write('No data available for the selected car park.')
+    st.write('Please select a region with available car parks.')
