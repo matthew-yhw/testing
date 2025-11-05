@@ -41,7 +41,7 @@ map_data = region_data[['latitude', 'longitude', 'car_park']].drop_duplicates(su
 # Ensure lat/lon are numeric and drop invalid rows
 map_data = map_data[map_data['latitude'].notnull() & map_data['longitude'].notnull()]
 if not map_data.empty:
-    st.map(map_data, latitude='latitude', longitude='longitude', zoom=10, tooltip='car_park')
+    st.map(map_data, latitude='latitude', longitude='longitude', zoom=10)  # Removed tooltip
 else:
     st.write('No valid latitude/longitude data available for this region.')
 
