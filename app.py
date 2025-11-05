@@ -27,12 +27,12 @@ st.title('Hong Kong Car Park Vacancy Viewer')  # Web page title
 regions = sorted(df['region'].unique())
 selected_region = st.selectbox('Select Region', regions)
 
-# Step 4: Dropdown for selecting car park based on region
-car_parks = sorted(df[df['region'] == selected_region]['car_park'].unique())
-selected_car_park = st.selectbox('Select Car Park', car_parks)
+# Step 4: Filter car parks by selected region
+region_data = df[df['region'] == selected_region]
+car_parks = sorted(region_data['car_park'].unique())
 
-# Step 5: Filter data for the selected car park
-park_data = df[df['car_park'] == selected_car_park].sort_values('timestamp')
+# Step 5: Dropdown for selecting car park
+selected_car_park = st.selectbox('Select Car Park', car_parks)
 
 # Step 6: Display map of all car parks in the selected region
 st.subheader(f'Car Parks in {selected_region}')
