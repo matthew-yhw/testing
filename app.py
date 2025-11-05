@@ -74,7 +74,9 @@ if not map_data.empty:
         map_data['distance'] = ((map_data['latitude'] - clicked_latlng['lat'])**2 + 
                                (map_data['longitude'] - clicked_latlng['lng'])**2)**0.5
         closest_park = map_data.loc[map_data['distance'].idxmin(), 'car_park']
-        st.session_state.selected_car_park = closest_park
+        if map_data['distance'].min() < 0.01:  # Threshold to ensure click is near a marker
+            st.session_state.selected_car_park = closest_park
+            st.write(f"Debug: Clicked car park - {closest_park}")
 else:
     st.write('No valid latitude/longitude data available for this region.')
 
@@ -82,18 +84,21 @@ else:
 selected_car_park = st.selectbox('Select Car Park', car_parks, 
                                  index=car_parks.index(st.session_state.selected_car_park) 
                                  if st.session_state.selected_car_park in car_parks else 0,
-                                 key='car_park_select')
-st.session_state.selected_car_park = selected_car_park
+                                 key='car_park_select_unique')
+
+# Update session state when dropdown changes
+if selected_car_park != st.session_state.selected_car_park:
+    st.session_state.selected_car_park = selected_car_park
 
 # Step 8: Plot bar chart for the selected car park
-park_data = region_data[region_data['car_park'] == selected_car_park].sort_values('timestamp')
+park_data = region_data[region_data['car_park'] == st.session_state.selected_car_park].sort_values('timestamp')
 if not park_data.empty:
-    st.subheader(f'Vacancy for {selected_car_park}')
+    st.subheader(f'Vacancy for {st.session_state.selected_car_park}')
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.bar(park_data['timestamp'], park_data['vacancy'], width=0.01)
     ax.set_xlabel('Timestamp')
     ax.set_ylabel('Vacancy')
-    ax.set_title(f'Vacancy Historical Record for {selected_car_park}')
+    ax.set_title(f'Vacancy Historical Record for {st.session_state.selected_car_park}')
     plt.xticks(rotation=45)
     plt.tight_layout()
     st.pyplot(fig)
